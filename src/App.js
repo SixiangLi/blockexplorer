@@ -1,23 +1,15 @@
-import { Alchemy, Network } from 'alchemy-sdk';
-import { useEffect, useState } from 'react';
+import alchemy from './alchemy';
+import { useEffect, useState, useMemo } from 'react';
+import { Box, Container, Card, CardHeader, CardContent, Typography } from '@mui/material';
+
+import LatestBlock from './components/LatestBlock';
+import BlockItem from './components/BlockItem';
 
 import './App.css';
-
-// Refer to the README doc for more information about using API
-// keys in client-side code. You should never do this in production
-// level code.
-const settings = {
-  apiKey: process.env.REACT_APP_ALCHEMY_API_KEY,
-  network: Network.ETH_MAINNET,
-};
-
-
-// In this week's lessons we used ethers.js. Here we are using the
-// Alchemy SDK is an umbrella library with several different packages.
-//
-// You can read more about the packages here:
-//   https://docs.alchemy.com/reference/alchemy-sdk-api-surface-overview#api-surface
-const alchemy = new Alchemy(settings);
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 
 function App() {
   const [blockNumber, setBlockNumber] = useState();
@@ -30,7 +22,35 @@ function App() {
     getBlockNumber();
   });
 
-  return <div className="App">Block Number: {blockNumber}</div>;
+  const LatestBlocks = useMemo(()=>{
+    const blocks = []
+    for(let i=0; i<blockNumber && i< 6; i++){
+      blocks.push(blockNumber - i)
+    }
+    return (<>{
+      blocks.map((number)=>{
+        return <BlockItem key={number} number={number} />
+      })
+    }</>)
+  }, [blockNumber])
+
+  return (
+    <Box mt={3}>
+      <Container>
+        <Card>
+          <LatestBlock blockNumber={blockNumber} />
+        </Card>
+        <Box mt={3}>
+          <Card>
+            <CardContent>
+              <Typography variant="h4">Latest Blocks</Typography>
+              {LatestBlocks}
+            </CardContent>
+          </Card>
+        </Box>
+      </Container>
+    </Box>
+  )
 }
 
 export default App;
